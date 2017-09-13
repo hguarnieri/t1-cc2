@@ -25,14 +25,8 @@ WS
     : (' ' | '\t' | '\r' | '\n') {skip();}
     ;
 
-
-
 programa
     : declaracoes 'algoritmo' corpo 'fim_algoritmo'
-    ;
-
-declaracoes
-    : decl_local_global*
     ;
 
 decl_local_global
@@ -40,12 +34,10 @@ decl_local_global
     | declaracao_global
     ;
 
-
-
-
-declaracao_local :'declare' variavel
-| 'constante' IDENT ':' tipo_basico '=' valor_constante
-| 'tipo' IDENT ':' tipo;
+declaracao_local
+    : 'declare' variavel
+    | 'constante' IDENT ':' tipo_basico '=' valor_constante
+    | 'tipo' IDENT ':' tipo
 
 variavel
     : IDENT dimensao mais_var ':' tipo
@@ -91,10 +83,15 @@ tipo_basico_ident
     ;
 
 tipo_estendido
-: ponteiros_opcionais tipo_basico_ident;
+    : ponteiros_opcionais tipo_basico_ident
+    ;
 
 valor_constante
-    : CADEIA | NUM_INT | NUM_REAL | 'verdadeiro' | 'falso'
+    : CADEIA
+    | NUM_INT
+    | NUM_REAL
+    | 'verdadeiro'
+    | 'falso'
     ;
 
 registro
@@ -107,7 +104,8 @@ declaracao_global
     ;
 
 parametros_opcional
-    : parametro |
+    : parametro
+    |
     ;
 
 parametro
@@ -115,11 +113,13 @@ parametro
     ;
 
 var_opcional
-    : var |
+    : var
+    |
     ;
 
 mais_parametros
-    : ',' parametro |
+    : ',' parametro
+    |
     ;
 
 declaracoes_locais
@@ -136,19 +136,19 @@ comandos
 
 cmd
     : 'leia' '(' identificador mais_ident ')'
-| 'escreva' '(' expressao mais_expressao ')'
-| 'se' expressao 'entao' comandos senao_opcional 'fim_se'
-| 'caso' exp_aritmetica 'seja' selecao senao_opcional 'fim_caso'
-| 'para' IDENT '<-' exp_aritmetica 'ate' exp_aritmetica 'faca' comandos 'fim_para'
-| 'enquanto' expressao 'faca' comandos 'fim_enquanto'
-| 'faca' comandos 'ate' expressao
-| '^' IDENT outros_ident dimensao '<-' expressao
-| IDENT chamada_atribuicao
-| 'retorne' expressao
+    | 'escreva' '(' expressao mais_expressao ')'
+    | 'se' expressao 'entao' comandos senao_opcional 'fim_se'
+    | 'caso' exp_aritmetica 'seja' selecao senao_opcional 'fim_caso'
+    | 'para' IDENT '<-' exp_aritmetica 'ate' exp_aritmetica 'faca' comandos 'fim_para'
+    | 'enquanto' expressao 'faca' comandos 'fim_enquanto'
+    | 'faca' comandos 'ate' expressao
+    | '^' IDENT outros_ident dimensao '<-' expressao
+    | IDENT chamada_atribuicao
+    | 'retorne' expressao
     ;
 
-mais_expressao :
-    ',' expressao mais_expressao
+mais_expressao
+    : ',' expressao mais_expressao
     |
     ;
 
@@ -249,15 +249,64 @@ parcela_nao_unario
     CADEIA
     ;
 
-outras_parcelas : '%' parcela outras_parcelas | ;
-chamada_partes : '(' expressao mais_expressao ')' | outros_ident dimensao | ;
-exp_relacional : exp_aritmetica op_opcional;
-op_opcional : op_relacional exp_aritmetica | ;
-op_relacional : '=' | '' | '=' | '=' | '' | '' ;
-expressao : termo_logico outros_termos_logicos
-op_nao : 'nao' | ;
-termo_logico : fator_logico outros_fatores_logicos;
-outros_termos_logicos : 'ou' termo_logico outros_termos_logicos | ;
-outros_fatores_logicos : 'e' fator_logico outros_fatores_logicos | ;
-fator_logico : op_nao parcela_logica;
-parcela_logica : 'verdadeiro' | 'falso' | exp_relacional;
+outras_parcelas
+    : '%' parcela outras_parcelas
+    |
+    ;
+
+chamada_partes
+    : '(' expressao mais_expressao ')'
+    | outros_ident dimensao
+    |
+    ;
+
+exp_relacional
+    : exp_aritmetica op_opcional
+    ;
+
+op_opcional
+    : op_relacional exp_aritmetica
+    |
+    ;
+
+op_relacional
+    : '='
+    | '<>'
+    | '>='
+    | '<='
+    | '>'
+    | '<'
+    ;
+
+expressao
+    : termo_logico outros_termos_logicos
+    ;
+
+op_nao
+    : 'nao'
+    |
+    ;
+
+termo_logico
+    : fator_logico outros_fatores_logicos
+    ;
+
+outros_termos_logicos
+    : 'ou' termo_logico outros_termos_logicos
+    |
+    ;
+
+outros_fatores_logicos
+    : 'e' fator_logico outros_fatores_logicos
+    |
+    ;
+
+fator_logico
+    : op_nao parcela_logica
+    ;
+
+parcela_logica
+    : 'verdadeiro'
+    | 'falso'
+    | exp_relacional
+    ;
