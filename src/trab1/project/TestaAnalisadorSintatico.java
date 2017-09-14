@@ -1,4 +1,4 @@
-package trab1;
+package trab1.project;
 
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -6,6 +6,8 @@ import java.io.IOException;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
+import trab1.linguagem.T1Lexer;
+import trab1.linguagem.T1Parser;
 
 public class TestaAnalisadorSintatico {
 
@@ -15,9 +17,9 @@ public class TestaAnalisadorSintatico {
         // Obs: a linha abaixo está configurada para usar como entrada o arquivo lua1.txt
         // Modifique-a para testar os demais exemplos
         ANTLRInputStream input = new ANTLRInputStream(args[0]);
-        t1Lexer lexer = new t1Lexer(input);
+        T1Lexer lexer = new T1Lexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
-        t1Parser parser = new t1Parser(tokens);
+        T1Parser parser = new T1Parser(tokens);
         parser.addErrorListener(new T1ErrorListener(out));
         parser.programa();
         if (!out.isModificado()) {

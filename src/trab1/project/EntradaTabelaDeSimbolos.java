@@ -1,4 +1,4 @@
-package trab1;
+package trab1.project;
 
 public class EntradaTabelaDeSimbolos {
     private String lexema;

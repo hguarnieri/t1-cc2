@@ -1,4 +1,4 @@
-package trab1;
+package trab1.project;
 
 import java.util.ArrayList;
 import java.util.List;
