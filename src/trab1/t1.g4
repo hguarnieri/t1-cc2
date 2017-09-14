@@ -29,6 +29,11 @@ programa
     : declaracoes 'algoritmo' corpo 'fim_algoritmo'
     ;
 
+
+declaracoes
+    : decl_local_global declaracoes | 
+    ;
+
 decl_local_global
     : declaracao_local
     | declaracao_global
@@ -38,6 +43,7 @@ declaracao_local
     : 'declare' variavel
     | 'constante' IDENT ':' tipo_basico '=' valor_constante
     | 'tipo' IDENT ':' tipo
+    ;
 
 variavel
     : IDENT dimensao mais_var ':' tipo
@@ -52,7 +58,7 @@ identificador
     ;
 
 ponteiros_opcionais
-    : ponteiros_opcionais |
+    : '^' ponteiros_opcionais |
     ;
 
 outros_ident
@@ -60,7 +66,7 @@ outros_ident
     ;
 
 dimensao
-    : '[' exp_aritmetica ']' dimensao' |
+    : '[' exp_aritmetica ']' dimensao |
     ;
 
 tipo
@@ -113,7 +119,7 @@ parametro
     ;
 
 var_opcional
-    : var
+    : 'var'
     |
     ;
 
