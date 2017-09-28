@@ -20,6 +20,12 @@ NUM_REAL
 COMENTARIO
     : '{' ~('\n' | '\r' | '}')* '}' {skip();}
     ;
+    
+
+COMENTARIOERRO
+    :   '{' (~('}'|'\n'))* '\n' {throw new ParseCancellationException("Linha "+getLine()+": comentario nao fechado");}
+    ;
+ 
 
 WS
     : (' ' | '\t' | '\r' | '\n') {skip();}
@@ -31,7 +37,7 @@ programa
 
 
 declaracoes
-    : decl_local_global declaracoes | 
+    : (decl_local_global)*
     ;
 
 decl_local_global
@@ -50,7 +56,7 @@ variavel
     ;
 
 mais_var
-    : ',' IDENT dimensao mais_var |
+    : (',' IDENT dimensao)*
     ;
 
 identificador
@@ -58,15 +64,15 @@ identificador
     ;
 
 ponteiros_opcionais
-    : '^' ponteiros_opcionais |
+    : ('^')*
     ;
 
 outros_ident
-    : '.' identificador |
+    : ('.' identificador)?
     ;
 
 dimensao
-    : '[' exp_aritmetica ']' dimensao |
+    : ('[' exp_aritmetica ']')*
     ;
 
 tipo
@@ -74,10 +80,11 @@ tipo
     ;
 
 mais_ident
-    : ',' identificador mais_ident | ;
+    : (',' identificador)*
+    ;
 
 mais_variaveis
-    : variavel mais_variaveis |
+    : (variavel)*
     ;
 
 tipo_basico
@@ -110,22 +117,19 @@ declaracao_global
     ;
 
 parametros_opcional
-    : parametro
-    |
+    : (parametro)?
     ;
 
 parametro
-    : var_opcional identificador mais_ident ':' tipo_estendido mais_parametros
+    : var_opcional identificador mais_ident ':' tipo_estendido (mais_parametros)*
     ;
 
 var_opcional
-    : 'var'
-    |
+    : ('var')?
     ;
 
 mais_parametros
-    : ',' parametro
-    |
+    : (',' parametro)
     ;
 
 declaracoes_locais
@@ -137,7 +141,7 @@ corpo
     ;
 
 comandos
-    : cmd comandos |
+    : (cmd)*
     ;
 
 cmd
@@ -154,13 +158,11 @@ cmd
     ;
 
 mais_expressao
-    : ',' expressao mais_expressao
-    |
+    : (',' expressao)*
     ;
 
 senao_opcional
-    : 'senao' comandos
-    |
+    : ('senao' comandos)?
     ;
 
 chamada_atribuicao
@@ -169,8 +171,7 @@ chamada_atribuicao
     ;
 
 argumentos_opcional
-    : expressao mais_expressao
-    |
+    : (expressao mais_expressao)?
     ;
 
 selecao
@@ -178,8 +179,7 @@ selecao
     ;
 
 mais_selecao
-    : selecao
-    |
+    : (selecao)?
     ;
 
 constantes
@@ -187,8 +187,7 @@ constantes
     ;
 
 mais_constantes
-    : ',' constantes
-    |
+    : (',' constantes)?
     ;
 
 numero_intervalo
@@ -196,13 +195,11 @@ numero_intervalo
     ;
 
 intervalo_opcional
-    : '..' op_unario NUM_INT
-    |
+    : ('..' op_unario NUM_INT)?
     ;
 
 op_unario
-    : '-'
-    |
+    : ('-')?
     ;
 
 exp_aritmetica
@@ -224,8 +221,7 @@ termo
     ;
 
 outros_termos
-    : op_adicao termo outros_termos
-    |
+    : (op_adicao termo)*
     ;
 
 fator
@@ -233,8 +229,7 @@ fator
     ;
 
 outros_fatores
-    : op_multiplicacao fator outros_fatores
-    |
+    : (op_multiplicacao fator)*
     ;
 
 parcela
@@ -256,8 +251,7 @@ parcela_nao_unario
     ;
 
 outras_parcelas
-    : '%' parcela outras_parcelas
-    |
+    : ('%' parcela)*
     ;
 
 chamada_partes
@@ -271,8 +265,7 @@ exp_relacional
     ;
 
 op_opcional
-    : op_relacional exp_aritmetica
-    |
+    : (op_relacional exp_aritmetica)?
     ;
 
 op_relacional
@@ -298,13 +291,11 @@ termo_logico
     ;
 
 outros_termos_logicos
-    : 'ou' termo_logico outros_termos_logicos
-    |
+    : ('ou' termo_logico)*
     ;
 
 outros_fatores_logicos
-    : 'e' fator_logico outros_fatores_logicos
-    |
+    : ('e' fator_logico)*
     ;
 
 fator_logico
@@ -316,3 +307,5 @@ parcela_logica
     | 'falso'
     | exp_relacional
     ;
+
+ERROR: . { throw new ParseCancellationException("Linha "+getLine()+": "+getText()+" - simbolo nao identificado"); };

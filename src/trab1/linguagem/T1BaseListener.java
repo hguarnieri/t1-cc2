@@ -1,4 +1,4 @@
-// Generated from T1.g4 by ANTLR 4.7
+// Generated from /home/lucas/Documents/t1-cc2/src/trab1/linguagem/T1.g4 by ANTLR 4.7
 package trab1.linguagem;
 
 import org.antlr.v4.runtime.ParserRuleContext;
