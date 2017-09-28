@@ -20,3 +20,12 @@ Estagio do projeto
   sudo java -jar "/home/lucas/Documents/t1-cc2/corretor/CorretorTrabalho1.jar" "java -jar /home/lucas/Documents/t1-cc2/dist/Trab1.jar" gcc "/home/lucas/Documents/t1-cc2/temp" "/home/lucas/Documents/t1-cc2/casosDeTesteT1/" "407747,407887,407828" tudo
 
 
+Comandos:
+
+java -jar "/home/lucas/Documents/t1-cc2/corretor/CorretorTrabalho1.jar" "java -jar /home/lucas/Documents/t1-cc2/dist/Trab1.jar" gcc "/home/lucas/Documents/t1-cc2/temp" "/home/lucas/Documents/t1-cc2/casosDeTesteT1/" "408220 203922 233333" sintatico
+
+java -jar antlr-4.7-complete.jar "/home/lucas/Documents/t1-cc2/src/trab1/linguagem/T1.g4" -package trab1.linguagem
+
+
+
+
