@@ -16,6 +16,7 @@ import trab1.linguagem.T1Parser;
 public class AnalisadorSemantico extends T1BaseVisitor {
     PilhaDeTabelas pilhaDeTabelas = new PilhaDeTabelas();
     SaidaParser sp;
+    String ultimoTipo = "";
 
     public AnalisadorSemantico(SaidaParser sp) {
         this.sp = sp;
@@ -46,14 +47,25 @@ public class AnalisadorSemantico extends T1BaseVisitor {
             pilhaDeTabelas.topo().adicionarSimbolo(nomeVar, tipoVar);
         }
         
-        // Se tiver mais variáveis, faz o mesmo procedimento de cima
-        for(TerminalNode s : ctx.variavel().mais_var().IDENT()) {
+        if (ctx.variavel().mais_var() != null) {
+            ultimoTipo = tipoVar;
+            super.visitMais_var(ctx.variavel().mais_var());
+        }
+        
+        return super.visitDeclaracao_local(ctx); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Object visitMais_var(T1Parser.Mais_varContext ctx) {
+        System.out.println("Mais var");
+         // Se tiver mais variáveis, faz o mesmo procedimento de cima
+        for(TerminalNode s : ctx.IDENT()) {
             String nomeVar1 = s.getText();
             if (!pilhaDeTabelas.topo().existeSimbolo(nomeVar1)){
-                pilhaDeTabelas.topo().adicionarSimbolo(nomeVar1, tipoVar);
+                pilhaDeTabelas.topo().adicionarSimbolo(nomeVar1, ultimoTipo);
             }
         }
-        return super.visitDeclaracao_local(ctx); //To change body of generated methods, choose Tools | Templates.
+        return super.visitMais_var(ctx); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
@@ -63,16 +75,29 @@ public class AnalisadorSemantico extends T1BaseVisitor {
 
     @Override
     public Object visitCmd(T1Parser.CmdContext ctx) {
+        System.out.println("visit CMD!");
+        
         // Se não encontrou a variável, exibe erro
         if (ctx.identificador() != null) {
             String nomeVar = ctx.identificador().getText();
             if (!pilhaDeTabelas.topo().existeSimbolo(nomeVar)){
-                sp.println("Linha "+ctx.identificador().IDENT().getSymbol().getLine()+": identificador "+ nomeVar +" nao declarado");
+                sp.println("Linha " + ctx.identificador().IDENT().getSymbol().getLine() + ": identificador " + nomeVar + " nao declarado");
             }
         }
+        
         return super.visitCmd(ctx); //To change body of generated methods, choose Tools | Templates.
     }
-    
-    
 
+    @Override
+    public Object visitMais_ident(T1Parser.Mais_identContext ctx) {
+        if (ctx != null) {
+            for (T1Parser.IdentificadorContext identificador : ctx.identificador()) {
+                String nomeVar = identificador.getText();
+                if (!pilhaDeTabelas.topo().existeSimbolo(nomeVar)){
+                    sp.println("Linha " + identificador.IDENT().getSymbol().getLine() + ": identificador " + nomeVar + " nao declarado");
+                }
+            }
+        }
+        return super.visitMais_ident(ctx); //To change body of generated methods, choose Tools | Templates.
+    }
 }
