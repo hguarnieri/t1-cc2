@@ -45,6 +45,8 @@ public class AnalisadorSemantico extends T1BaseVisitor {
         String tipoVar = ctx.variavel().tipo().getText();
         if (!pilhaDeTabelas.topo().existeSimbolo(nomeVar)){
             pilhaDeTabelas.topo().adicionarSimbolo(nomeVar, tipoVar);
+        } else {
+            sp.println("Linha " + ctx.variavel().IDENT().getSymbol().getLine() + ": identificador " + nomeVar + " ja declarado anteriormente");
         }
         
         if (ctx.variavel().mais_var() != null) {
@@ -57,12 +59,14 @@ public class AnalisadorSemantico extends T1BaseVisitor {
 
     @Override
     public Object visitMais_var(T1Parser.Mais_varContext ctx) {
-        System.out.println("Mais var");
+        //System.out.println("Mais var");
          // Se tiver mais variáveis, faz o mesmo procedimento de cima
         for(TerminalNode s : ctx.IDENT()) {
-            String nomeVar1 = s.getText();
-            if (!pilhaDeTabelas.topo().existeSimbolo(nomeVar1)){
-                pilhaDeTabelas.topo().adicionarSimbolo(nomeVar1, ultimoTipo);
+            String nomeVar = s.getText();
+            if (!pilhaDeTabelas.topo().existeSimbolo(nomeVar)){
+                pilhaDeTabelas.topo().adicionarSimbolo(nomeVar, ultimoTipo);
+            } else {
+                sp.println("Linha " + s.getSymbol().getLine() + ": identificador " + nomeVar + " ja declarado anteriormente");
             }
         }
         return super.visitMais_var(ctx); //To change body of generated methods, choose Tools | Templates.
@@ -75,7 +79,10 @@ public class AnalisadorSemantico extends T1BaseVisitor {
 
     @Override
     public Object visitCmd(T1Parser.CmdContext ctx) {
-        System.out.println("visit CMD!");
+        //System.out.println("visit CMD!");
+//        if (ctx.expressao() != null) {
+//            System.out.println(ctx.mais_expressao().getText());
+//        }
         
         // Se não encontrou a variável, exibe erro
         if (ctx.identificador() != null) {
@@ -100,4 +107,67 @@ public class AnalisadorSemantico extends T1BaseVisitor {
         }
         return super.visitMais_ident(ctx); //To change body of generated methods, choose Tools | Templates.
     }
+
+    @Override
+    public Object visitMais_expressao(T1Parser.Mais_expressaoContext ctx) {
+//        System.out.println("mais expressao");
+//        System.out.println(ctx.getText());
+//        for(T1Parser.ExpressaoContext s : ctx.expressao()) {
+//            System.out.println(s.);
+//        }
+        return super.visitMais_expressao(ctx); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Object visitExpressao(T1Parser.ExpressaoContext ctx) {
+        //System.out.println("expressao");
+        //System.out.println(ctx.children.get(0).getText());
+        //System.out.println(ctx.getText());
+        return super.visitExpressao(ctx); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Object visitExp_aritmetica(T1Parser.Exp_aritmeticaContext ctx) {
+        //System.out.println("expressao ARITMETICA");
+        //System.out.println(ctx.getText());
+        return super.visitExp_aritmetica(ctx); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Object visitOutros_termos(T1Parser.Outros_termosContext ctx) {
+        //System.out.println("Outros termos **********");
+        //System.out.println(ctx.getText());
+        return super.visitOutros_termos(ctx); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Object visitFator(T1Parser.FatorContext ctx) {
+        //System.out.println("FATOR ******");
+        if (ctx.getText().matches("^[a-zA-Z_$][a-zA-Z_$0-9]*$")) { // Apenas variáveis
+            String nomeVar = ctx.getText();
+            if (!pilhaDeTabelas.topo().existeSimbolo(nomeVar)){
+                sp.println("Linha " + ctx.start.getLine() + ": identificador " + nomeVar + " nao declarado");
+            }
+        }
+        return super.visitFator(ctx); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Object visitOp_adicao(T1Parser.Op_adicaoContext ctx) {
+        //System.out.println("adicao!!!!!");
+        //System.out.println(ctx.getText());
+        return super.visitOp_adicao(ctx); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Object visitOp_multiplicacao(T1Parser.Op_multiplicacaoContext ctx) {
+        //System.out.println();
+        return super.visitOp_multiplicacao(ctx); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    
+    
+    
+    
+    
 }

@@ -39,11 +39,12 @@ public class TestaAnalisadorSintatico {
             }
         }
         
+        sp.println("Fim da compilacao");
         System.out.println(sp.toString());
         
 //        try (FileWriter fw = new FileWriter(args[1])) {
 //            fw.write(sp.toString());
-//            fw.write("Fim da compilacao");
+//            fw.write();
 //            fw.flush();
 //            fw.close();
 //        }
