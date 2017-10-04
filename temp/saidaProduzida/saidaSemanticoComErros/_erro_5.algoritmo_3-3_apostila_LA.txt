@@ -1,0 +1,22 @@
+Linha 7: identificador lado1 ja declarado anteriormente
+Linha 14: atribuicao nao compativel para existeTriangulo
+Linha 14: atribuicao nao compativel para existeTriangulo
+Linha 14: atribuicao nao compativel para existeTriangulo
+Linha 15: atribuicao nao compativel para existeTriangulo
+Linha 15: atribuicao nao compativel para existeTriangulo
+Linha 15: atribuicao nao compativel para existeTriangulo
+Linha 16: atribuicao nao compativel para existeTriangulo
+Linha 16: atribuicao nao compativel para existeTriangulo
+Linha 16: atribuicao nao compativel para existeTriangulo
+Linha 18: atribuicao nao compativel para ehEquilatero
+Linha 18: atribuicao nao compativel para ehEquilatero
+Linha 18: atribuicao nao compativel para ehEquilatero
+Linha 18: atribuicao nao compativel para ehEquilatero
+Linha 21: atribuicao nao compativel para ehIsosceles
+Linha 21: atribuicao nao compativel para ehIsosceles
+Linha 21: atribuicao nao compativel para ehIsosceles
+Linha 21: atribuicao nao compativel para ehIsosceles
+Linha 21: atribuicao nao compativel para ehIsosceles
+Linha 21: atribuicao nao compativel para ehIsosceles
+Linha 21: atribuicao nao compativel para ehIsosceles
+Fim da compilacao

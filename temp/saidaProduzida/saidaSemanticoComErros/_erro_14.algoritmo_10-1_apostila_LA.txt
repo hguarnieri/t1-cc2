@@ -1,0 +1,4 @@
+Linha 11: atribuicao nao compativel para valor
+Linha 16: identificador valor[i] nao declarado
+Linha 17: atribuicao nao compativel para soma
+Fim da compilacao

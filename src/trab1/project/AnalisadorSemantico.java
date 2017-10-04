@@ -17,7 +17,10 @@ public class AnalisadorSemantico extends T1BaseVisitor {
     PilhaDeTabelas pilhaDeTabelas = new PilhaDeTabelas();
     SaidaParser sp;
     String ultimoTipo = "";
-
+    String ultimaChamadaAtribuicao = "";
+    Tipo ultimoTipoChamadaAtribuicao = null;
+    int ultimoComando = 0;
+    
     public AnalisadorSemantico(SaidaParser sp) {
         this.sp = sp;
     }
@@ -39,19 +42,62 @@ public class AnalisadorSemantico extends T1BaseVisitor {
     }
 
     @Override
+    public Object visitConstantes(T1Parser.ConstantesContext ctx) {
+        //System.out.println("constante");
+        return super.visitConstantes(ctx); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Object visitValor_constante(T1Parser.Valor_constanteContext ctx) {
+        //System.out.println(ctx.parent.getText());
+        return super.visitValor_constante(ctx); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    private boolean isValidType(String type) {
+        if (type.equals("literal") || type.equals("inteiro") 
+                || type.equals("real") || type.equals("logico")) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public Object visitDeclaracao_local(T1Parser.Declaracao_localContext ctx) {
-        // Pega a primeira variável
-        String nomeVar = ctx.variavel().IDENT().toString();
-        String tipoVar = ctx.variavel().tipo().getText();
-        if (!pilhaDeTabelas.topo().existeSimbolo(nomeVar)){
-            pilhaDeTabelas.topo().adicionarSimbolo(nomeVar, tipoVar);
-        } else {
-            sp.println("Linha " + ctx.variavel().IDENT().getSymbol().getLine() + ": identificador " + nomeVar + " ja declarado anteriormente");
+        
+        // Constantes
+        if (ctx.IDENT() != null) {
+            String nomeVar = ctx.IDENT().getText();
+            String tipoVar = ctx.tipo_basico().getText();
+            
+            if (!isValidType(tipoVar)) {
+                sp.println("Linha " + ctx.variavel().IDENT().getSymbol().getLine() + ": tipo " + tipoVar + " nao declarado");
+            } 
+            
+            if (!pilhaDeTabelas.existeSimbolo(nomeVar)){
+                pilhaDeTabelas.topo().adicionarSimbolo(nomeVar, tipoVar);
+            } else {
+                sp.println("Linha " + ctx.variavel().IDENT().getSymbol().getLine() + ": identificador " + nomeVar + " ja declarado anteriormente");
+            }          
         }
         
-        if (ctx.variavel().mais_var() != null) {
-            ultimoTipo = tipoVar;
-            super.visitMais_var(ctx.variavel().mais_var());
+        // Demais variáveis
+        if (ctx.variavel() != null) {
+            String nomeVar = ctx.variavel().IDENT().toString();
+            String tipoVar = ctx.variavel().tipo().getText();
+            if (!isValidType(tipoVar)) {
+                sp.println("Linha " + ctx.variavel().IDENT().getSymbol().getLine() + ": tipo " + tipoVar + " nao declarado");
+            } 
+            
+            if (!pilhaDeTabelas.existeSimbolo(nomeVar)){
+                pilhaDeTabelas.topo().adicionarSimbolo(nomeVar, tipoVar);
+            } else {
+                sp.println("Linha " + ctx.variavel().IDENT().getSymbol().getLine() + ": identificador " + nomeVar + " ja declarado anteriormente");
+            }  
+
+            if (ctx.variavel().mais_var() != null) {
+                ultimoTipo = tipoVar;
+                super.visitMais_var(ctx.variavel().mais_var());
+            }
         }
         
         return super.visitDeclaracao_local(ctx); //To change body of generated methods, choose Tools | Templates.
@@ -59,11 +105,10 @@ public class AnalisadorSemantico extends T1BaseVisitor {
 
     @Override
     public Object visitMais_var(T1Parser.Mais_varContext ctx) {
-        //System.out.println("Mais var");
          // Se tiver mais variáveis, faz o mesmo procedimento de cima
         for(TerminalNode s : ctx.IDENT()) {
             String nomeVar = s.getText();
-            if (!pilhaDeTabelas.topo().existeSimbolo(nomeVar)){
+            if (!pilhaDeTabelas.existeSimbolo(nomeVar)){
                 pilhaDeTabelas.topo().adicionarSimbolo(nomeVar, ultimoTipo);
             } else {
                 sp.println("Linha " + s.getSymbol().getLine() + ": identificador " + nomeVar + " ja declarado anteriormente");
@@ -79,15 +124,11 @@ public class AnalisadorSemantico extends T1BaseVisitor {
 
     @Override
     public Object visitCmd(T1Parser.CmdContext ctx) {
-        //System.out.println("visit CMD!");
-//        if (ctx.expressao() != null) {
-//            System.out.println(ctx.mais_expressao().getText());
-//        }
-        
+        ultimoComando = ctx.comando;
         // Se não encontrou a variável, exibe erro
         if (ctx.identificador() != null) {
             String nomeVar = ctx.identificador().getText();
-            if (!pilhaDeTabelas.topo().existeSimbolo(nomeVar)){
+            if (!pilhaDeTabelas.existeSimbolo(nomeVar)){
                 sp.println("Linha " + ctx.identificador().IDENT().getSymbol().getLine() + ": identificador " + nomeVar + " nao declarado");
             }
         }
@@ -100,7 +141,7 @@ public class AnalisadorSemantico extends T1BaseVisitor {
         if (ctx != null) {
             for (T1Parser.IdentificadorContext identificador : ctx.identificador()) {
                 String nomeVar = identificador.getText();
-                if (!pilhaDeTabelas.topo().existeSimbolo(nomeVar)){
+                if (!pilhaDeTabelas.existeSimbolo(nomeVar)){
                     sp.println("Linha " + identificador.IDENT().getSymbol().getLine() + ": identificador " + nomeVar + " nao declarado");
                 }
             }
@@ -109,43 +150,116 @@ public class AnalisadorSemantico extends T1BaseVisitor {
     }
 
     @Override
-    public Object visitMais_expressao(T1Parser.Mais_expressaoContext ctx) {
-//        System.out.println("mais expressao");
-//        System.out.println(ctx.getText());
-//        for(T1Parser.ExpressaoContext s : ctx.expressao()) {
-//            System.out.println(s.);
-//        }
+    public Object visitMais_expressao(T1Parser.Mais_expressaoContext ctx) {        
         return super.visitMais_expressao(ctx); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     public Object visitExpressao(T1Parser.ExpressaoContext ctx) {
-        //System.out.println("expressao");
-        //System.out.println(ctx.children.get(0).getText());
-        //System.out.println(ctx.getText());
+        if (ctx.getText().equals("verdadeiro") || ctx.getText().equals("falso")) {
+            sp.println("Linha " + ctx.start.getLine() + ": atribuicao nao compativel para " + ultimaChamadaAtribuicao);
+        }
         return super.visitExpressao(ctx); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
+    public Object visitChamada_atribuicao(T1Parser.Chamada_atribuicaoContext ctx) {
+        T1Parser.CmdContext context = (T1Parser.CmdContext) ctx.parent;
+        
+        ultimaChamadaAtribuicao = context.IDENT().getText();
+        ultimoTipoChamadaAtribuicao = getTipo(pilhaDeTabelas.getTipo(ultimaChamadaAtribuicao));
+        return super.visitChamada_atribuicao(ctx); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
     public Object visitExp_aritmetica(T1Parser.Exp_aritmeticaContext ctx) {
-        //System.out.println("expressao ARITMETICA");
-        //System.out.println(ctx.getText());
+        if (ultimoComando == 9 && ultimoTipoChamadaAtribuicao != null) {
+            String nomeVar = ctx.termo().getText();
+            Tipo tipoValor = getTipo(ctx.termo().getText());
+            Tipo tipoVar = getTipo(pilhaDeTabelas.getTipo(nomeVar));
+            if (tipoValor == Tipo.VARIAVEL) {
+                if (tipoVar != ultimoTipoChamadaAtribuicao) {
+                    sp.println("Linha " + ctx.start.getLine() + ": atribuicao nao compativel para " + ultimaChamadaAtribuicao);
+                }
+            } else {
+                if (getTipo(nomeVar) != ultimoTipoChamadaAtribuicao && isNotArithmetic(nomeVar)) {
+                    sp.println("Linha " + ctx.start.getLine() + ": atribuicao nao compativel para " + ultimaChamadaAtribuicao);
+                }
+            }
+
+            for(T1Parser.TermoContext t : ctx.outros_termos().termo()) {
+                Tipo tipoTermo = getTipo(t.getText());
+                if (tipoTermo == Tipo.VARIAVEL) {
+                    Tipo tipoTermoAtual = getTipo(pilhaDeTabelas.getTipo(t.getText()));
+                    if (tipoTermoAtual != ultimoTipoChamadaAtribuicao) {
+                        sp.println("Linha " + t.start.getLine() + ": atribuicao nao compativel para " + ultimaChamadaAtribuicao);
+                    }
+                } else {
+                    if (tipoTermo != ultimoTipoChamadaAtribuicao && isNotArithmetic(t.getText())) {
+                        sp.println("Linha " + t.start.getLine() + ": atribuicao nao compativel para " + ultimaChamadaAtribuicao);
+                    }
+                }
+            }
+        }
         return super.visitExp_aritmetica(ctx); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    private boolean isNotArithmetic(String valor) {
+        return valor.indexOf('*') == -1 && valor.indexOf('/') == -1 
+                && valor.indexOf('+') == -1 && valor.indexOf('-') == -1
+                && valor.indexOf('<') == -1 && valor.indexOf('>') == -1;
+    }
+    
+    enum Tipo {
+        STRING, VARIAVEL, INTEIRO, UNKNOWN, LOGICO
+    }
+    
+    private Tipo getTipo(String valor) {
+        if (valor == null) {
+            return Tipo.UNKNOWN;
+        }
+        
+        if (valor.equals("literal")) {
+            return Tipo.STRING;
+        }
+        
+        if (valor.equals("inteiro")) {
+            return Tipo.INTEIRO;
+        }
+        
+        if (valor.equals("real")) {
+            return Tipo.INTEIRO;
+        }
+        
+        if (valor.equals("\"falso\"") || valor.equals("\"verdadeiro\"") || valor.equals("logico")) {
+            return Tipo.LOGICO;
+        }
+        
+        if (valor.matches("\"[^\"]*\"")) {
+            return Tipo.STRING;
+        }
+        
+        if (valor.matches("^([+-]?[1-9]\\d*|0)$")) {
+            return Tipo.INTEIRO;
+        }
+        
+        if (valor.matches("^[a-zA-Z_$][a-zA-Z_$0-9]*$")) {
+            return Tipo.VARIAVEL;
+        }
+        
+        return Tipo.UNKNOWN;
     }
 
     @Override
     public Object visitOutros_termos(T1Parser.Outros_termosContext ctx) {
-        //System.out.println("Outros termos **********");
-        //System.out.println(ctx.getText());
         return super.visitOutros_termos(ctx); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     public Object visitFator(T1Parser.FatorContext ctx) {
-        //System.out.println("FATOR ******");
         if (ctx.getText().matches("^[a-zA-Z_$][a-zA-Z_$0-9]*$")) { // Apenas variáveis
             String nomeVar = ctx.getText();
-            if (!pilhaDeTabelas.topo().existeSimbolo(nomeVar)){
+            if (!pilhaDeTabelas.existeSimbolo(nomeVar)){
                 sp.println("Linha " + ctx.start.getLine() + ": identificador " + nomeVar + " nao declarado");
             }
         }
@@ -154,14 +268,14 @@ public class AnalisadorSemantico extends T1BaseVisitor {
 
     @Override
     public Object visitOp_adicao(T1Parser.Op_adicaoContext ctx) {
-        //System.out.println("adicao!!!!!");
-        //System.out.println(ctx.getText());
+        T1Parser.Outros_termosContext outros = (T1Parser.Outros_termosContext) ctx.parent;
         return super.visitOp_adicao(ctx); //To change body of generated methods, choose Tools | Templates.
     }
+    
+    
 
     @Override
     public Object visitOp_multiplicacao(T1Parser.Op_multiplicacaoContext ctx) {
-        //System.out.println();
         return super.visitOp_multiplicacao(ctx); //To change body of generated methods, choose Tools | Templates.
     }
     

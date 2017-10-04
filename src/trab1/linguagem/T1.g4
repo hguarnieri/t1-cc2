@@ -144,17 +144,47 @@ comandos
     : (cmd)*
     ;
 
-cmd
+cmd returns [int comando]
     : 'leia' '(' identificador mais_ident ')'
+    {
+        $comando = 1;
+    }
     | 'escreva' '(' expressao mais_expressao ')'
+    {
+        $comando = 2;
+    }
     | 'se' expressao 'entao' comandos senao_opcional 'fim_se'
+    {
+        $comando = 3;
+    }
     | 'caso' exp_aritmetica 'seja' selecao senao_opcional 'fim_caso'
+    {
+        $comando = 4;
+    }
     | 'para' IDENT '<-' exp_aritmetica 'ate' exp_aritmetica 'faca' comandos 'fim_para'
+    {
+        $comando = 5;
+    }
     | 'enquanto' expressao 'faca' comandos 'fim_enquanto'
+    {
+        $comando = 6;
+    }
     | 'faca' comandos 'ate' expressao
+    {
+        $comando = 7;
+    }
     | '^' IDENT outros_ident dimensao '<-' expressao
+    {
+        $comando = 8;
+    }
     | IDENT chamada_atribuicao
+    {
+        $comando = 9;
+    }
     | 'retorne' expressao
+    {
+        $comando = 10;
+    }
     ;
 
 mais_expressao

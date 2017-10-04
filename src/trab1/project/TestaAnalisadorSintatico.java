@@ -24,6 +24,7 @@ public class TestaAnalisadorSintatico {
 //            T1Parser parser = new T1Parser(tokens);
 //            parser.addErrorListener(new T1ErrorListener(sp));
 //            parser.programa();
+            
             ANTLRInputStream input = new ANTLRInputStream(new FileInputStream(args[0]));
             T1Lexer lexer = new T1Lexer(input);
             CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -31,8 +32,10 @@ public class TestaAnalisadorSintatico {
             parser.addErrorListener(new T1ErrorListener(sp));
             T1Parser.ProgramaContext arvore = parser.programa();
             
-            AnalisadorSemantico s = new AnalisadorSemantico(sp);
-            s.visitPrograma(arvore);
+            if (args[0].contains("semantico")) {
+                AnalisadorSemantico s = new AnalisadorSemantico(sp);
+                s.visitPrograma(arvore);
+            }
         } catch (ParseCancellationException pce) {
             if (pce.getMessage() != null) { 
                   sp.println(pce.getMessage());
@@ -40,13 +43,12 @@ public class TestaAnalisadorSintatico {
         }
         
         sp.println("Fim da compilacao");
-        System.out.println(sp.toString());
+        System.out.print(sp.toString());
         
-//        try (FileWriter fw = new FileWriter(args[1])) {
-//            fw.write(sp.toString());
-//            fw.write();
-//            fw.flush();
-//            fw.close();
-//        }
+        try (FileWriter fw = new FileWriter(args[1])) {
+            fw.write(sp.toString());
+            fw.flush();
+            fw.close();
+        }
     }
 }

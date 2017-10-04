@@ -1,0 +1,6 @@
+Linha 28: atribuicao nao compativel para colidiu
+Linha 28: atribuicao nao compativel para colidiu
+Linha 28: atribuicao nao compativel para colidiu
+Linha 28: atribuicao nao compativel para colidiu
+Linha 31: identificador colisao nao declarado
+Fim da compilacao
