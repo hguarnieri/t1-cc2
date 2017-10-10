@@ -37,6 +37,7 @@ public class AnalisadorSemantico2 extends T1BaseVisitor {
 
     @Override
     public Object visitVariavel(T1Parser.VariavelContext ctx) {
+        //System.out.println(ctx.tipo().getText());
         String nomeVar = ctx.IDENT().getText();
         String tipoVar = ctx.tipo().getText();
         this.lastDeclaredType = tipoVar;
@@ -94,6 +95,7 @@ public class AnalisadorSemantico2 extends T1BaseVisitor {
 
     @Override
     public Object visitExpressao(T1Parser.ExpressaoContext ctx) {
+        System.out.println(ctx.getText());
         if (ctx.getText().equals("verdadeiro") || ctx.getText().equals("falso")) {
             sp.println("Linha " + ctx.start.getLine() + ": atribuicao nao compativel para " + this.lastParentId);
         }
@@ -119,20 +121,18 @@ public class AnalisadorSemantico2 extends T1BaseVisitor {
         return super.visitOutros_termos(ctx); //To change body of generated methods, choose Tools | Templates.
     }
     
-    
-
     @Override
     public Object visitTermo(T1Parser.TermoContext ctx) {
         String termo = ctx.getText();
         int line = ctx.start.getLine();
         
-        if (checkIfExists(termo, line)) {
-            String type = getTypeOf(termo);
-            if (isAttribution() && this.lastAttributionType != null 
-                    && !isArithmetic(termo) && !type.equals(this.lastAttributionType)) {
-                sp.println("Linha " + line + ": atribuicao nao compativel para " + this.lastParentId);
-            }
-        }
+//        if (checkIfExists(termo, line)) {
+//            String type = getTypeOf(termo);
+//            if (isAttribution() && this.lastAttributionType != null 
+//                    && !isArithmetic(termo) && !type.equals(this.lastAttributionType)) {
+//                sp.println("Linha " + line + ": atribuicao nao compativel para " + this.lastParentId);
+//            }
+//        }
         
         return super.visitTermo(ctx);
     }

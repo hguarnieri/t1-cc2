@@ -7,6 +7,7 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import trab1.linguagem.T1Lexer;
 import trab1.linguagem.T1Parser;
 
@@ -32,9 +33,19 @@ public class TestaAnalisadorSintatico {
             parser.addErrorListener(new T1ErrorListener(sp));
             T1Parser.ProgramaContext arvore = parser.programa();
             
+            //System.out.println(arvore.corpo().getText());
+            
             if (args[0].contains("semantico")) {
-                AnalisadorSemantico s = new AnalisadorSemantico(sp);
-                s.visitPrograma(arvore);
+                ParseTreeWalker walker = new ParseTreeWalker();
+                AnalisadorSemantico3 listener = new AnalisadorSemantico3(sp);
+                walker.walk(listener, arvore);
+                
+//                AnalisadorSemantico2 listener = new AnalisadorSemantico2(sp);
+//                listener.visitPrograma(arvore);
+                //s.enterDeclaracoes_locais(arvore.corpo().declaracoes_locais());
+                //s.enterVariavel(arvore.);
+                //s.enterVariavel(arvore);
+                //s.enterPrograma(arvore);
             }
         } catch (ParseCancellationException pce) {
             if (pce.getMessage() != null) { 
@@ -45,10 +56,10 @@ public class TestaAnalisadorSintatico {
         sp.println("Fim da compilacao");
         System.out.print(sp.toString());
         
-        try (FileWriter fw = new FileWriter(args[1])) {
-            fw.write(sp.toString());
-            fw.flush();
-            fw.close();
-        }
+//        try (FileWriter fw = new FileWriter(args[1])) {
+//            fw.write(sp.toString());
+//            fw.flush();
+//            fw.close();
+//        }
     }
 }

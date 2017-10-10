@@ -52,6 +52,7 @@ declaracao_local
     ;
 
 variavel
+//    : id=IDENT dimensao (',' id+=IDENT dimensao)* ':' tipo
     : IDENT dimensao mais_var ':' tipo
     ;
 
@@ -266,12 +267,27 @@ parcela
     : op_unario parcela_unario | parcela_nao_unario
     ;
 
-parcela_unario
+parcela_unario returns [int tipo_parcela]
     : '^' IDENT outros_ident dimensao
+    {
+        $tipo_parcela = 1;
+    }
     | IDENT chamada_partes
+    {
+        $tipo_parcela = 2;
+    }
     | NUM_INT
+    {
+        $tipo_parcela = 3;
+    }
     | NUM_REAL
+    {
+        $tipo_parcela = 4;
+    }
     | '(' expressao ')'
+    {
+        $tipo_parcela = 5;
+    }
     ;
 
 parcela_nao_unario

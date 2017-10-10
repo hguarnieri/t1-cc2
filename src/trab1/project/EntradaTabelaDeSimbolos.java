@@ -19,7 +19,7 @@ public class EntradaTabelaDeSimbolos {
         this.ts = null;
     }
     
-    //para registros
+    // para registros
     public EntradaTabelaDeSimbolos(String nome, String tipo, TabelaDeSimbolos ts) {
         this.nome = nome;
         this.tipo = tipo;
