@@ -86,24 +86,69 @@ public class AnalisadorSemantico3 extends T1BaseListener {
         T1Parser.CmdContext parent = (T1Parser.CmdContext) ctx.parent;
         String attributionVar = parent.IDENT().getText();
         String typeOfAttributionVar = getTypeOfSymbol(attributionVar);
-        String primeiroTermo = ctx.expressao().termo_logico().fator_logico().parcela_logica().exp_relacional().exp_aritmetica().termo().getText();
-        boolean isValid = typeOfAttributionVar.equals(getTypeOfSymbol(primeiroTermo));
-        for (T1Parser.TermoContext t: ctx.expressao().termo_logico().fator_logico().parcela_logica().exp_relacional().exp_aritmetica().outros_termos().termo()) {
-            if (t.fator().parcela().parcela_nao_unario() != null) { // é uma cadeia
-                if (!typeOfAttributionVar.equals("literal")) {
+        String primeiroTermo = "";
+        boolean isValid = true;
+        if (ctx.expressao().termo_logico().fator_logico().parcela_logica().type == 1 ||
+                ctx.expressao().termo_logico().fator_logico().parcela_logica().type == 2) {
+            if (!typeOfAttributionVar.equals("logico")) {
+                isValid = false;
+            }
+        }
+        if (ctx.expressao().termo_logico().fator_logico().parcela_logica().exp_relacional() != null) {
+            if (ctx.expressao().termo_logico().fator_logico().parcela_logica().exp_relacional().exp_aritmetica().termo().fator().parcela().parcela_unario() != null) {
+                if (ctx.expressao().termo_logico().fator_logico().parcela_logica().exp_relacional().exp_aritmetica().termo().fator().parcela().parcela_unario().tipo_parcela == 2) {
+                    primeiroTermo = ctx.expressao().termo_logico().fator_logico().parcela_logica().exp_relacional().exp_aritmetica().termo().fator().parcela().parcela_unario().getText();
+                    
+                    isValid = typeOfAttributionVar.equals(getTypeOfSymbol(primeiroTermo));
+                }
+            } else if (ctx.expressao().termo_logico().fator_logico().parcela_logica().exp_relacional().exp_aritmetica().termo().fator().parcela().parcela_unario() != null 
+                    && ctx.expressao().termo_logico().fator_logico().parcela_logica().exp_relacional().exp_aritmetica().termo().fator().parcela().parcela_unario().tipo_parcela == 3) {
+                if (!typeOfAttributionVar.equals("inteiro")) {
+                    isValid = false;
+                }
+            } else {
+                //System.out.println(primeiroTermo);
+                if (typeOfAttributionVar.equals("literal")) {
+                    isValid = true;
+                } else {
                     isValid = false;
                 }
             }
-            if (t.fator().parcela().parcela_unario() != null) {
-                if (!typeOfAttributionVar.equals(getTypeOfSymbol(t.fator().parcela().parcela_unario().getText()))) {
-                    isValid = false;
+            
+            // atribuição lógica
+            if (ctx.expressao().termo_logico().outros_fatores_logicos().fator_logico().size() > 0
+                    && typeOfAttributionVar.equals("logico")) {
+                isValid = true;
+            }
+
+            //System.out.println(primeiroTermo);
+
+            for (T1Parser.TermoContext t: ctx.expressao().termo_logico().fator_logico().parcela_logica().exp_relacional().exp_aritmetica().outros_termos().termo()) {
+                //System.out.println(t.getText());
+                if (t.fator().parcela().parcela_nao_unario() != null) { // é uma cadeia
+                    if (!typeOfAttributionVar.equals("literal")) {
+                        isValid = false;
+                    }
+                }
+                if (t.fator().parcela().parcela_unario() != null && t.fator().parcela().parcela_unario().tipo_parcela == 2) {
+                    if (!typeOfAttributionVar.equals(getTypeOfSymbol(t.fator().parcela().parcela_unario().getText()))) {
+                        isValid = false;
+                    }
+                }
+                if (t.fator().parcela().parcela_unario() != null && t.fator().parcela().parcela_unario().tipo_parcela == 3) {
+                    if (!typeOfAttributionVar.equals("inteiro")) {
+                        isValid = false;
+                    }
                 }
             }
+            
         }
         
         if (!isValid) {
             sp.println("Linha " + ctx.start.getLine() + ": atribuicao nao compativel para " + attributionVar);
         }
+        
+        
         super.enterChamada_atribuicao(ctx); //To change body of generated methods, choose Tools | Templates.
     }
     

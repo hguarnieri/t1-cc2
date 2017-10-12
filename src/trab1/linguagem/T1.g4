@@ -348,10 +348,10 @@ fator_logico
     : op_nao parcela_logica
     ;
 
-parcela_logica
-    : 'verdadeiro'
-    | 'falso'
-    | exp_relacional
+parcela_logica returns [int type]
+    : 'verdadeiro' { $type = 1; }
+    | 'falso' { $type = 2; }
+    | exp_relacional { $type = 3; }
     ;
 
 ERROR: . { throw new ParseCancellationException("Linha "+getLine()+": "+getText()+" - simbolo nao identificado"); };
